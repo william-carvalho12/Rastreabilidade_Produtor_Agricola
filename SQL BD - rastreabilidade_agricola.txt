@@ -1,0 +1,127 @@
+CREATE DATABASE rastreabilidade_agricola
+GO
+USE rastreabilidade_agricola
+
+CREATE TABLE produtor(
+	cod_produtor 	INT								NOT NULL,
+    nome			VARCHAR(100)					NOT NULL,
+    cnpj			INT								NOT NULL,
+    propriedade		VARCHAR(200)					NULL,
+    ccir			INT								NOT NULL,
+    coordx			INT								NULL,
+    coordy			INT								NULL,
+    logradouro		VARCHAR(200)					NULL,
+    numero			INT CHECK (numero>0)			NULL,
+    bairro			VARCHAR(100)					NULL,
+    municipio		VARCHAR(100)					NULL,
+    uf				VARCHAR(5)						NOT NULL,
+    cep				CHAR(8) CHECK (len(cep)=8)		NULL,
+    email			VARCHAR(100)					NULL,
+    ddd				CHAR(2)							NULL,
+    tel				CHAR(8)							NULL,
+    
+    PRIMARY KEY (cod_produtor)
+)
+--
+CREATE TABLE cliente(
+	cod_cliente 	INT 							NOT NULL,
+    nome			VARCHAR(100)					NOT NULL,
+    sobrenome		VARCHAR(200)					NOT NULL,
+    cnpj			INT								NOT NULL,
+    inscestadual	INT								NOT NULL,
+    logradouro		VARCHAR(200)					NULL,
+    numero			INT CHECK (numero>0)			NULL,
+    complemento		VARCHAR(200)					NULL,
+    bairro			VARCHAR(100)					NULL,
+    municipio		VARCHAR(100)					NOT NULL,
+    uf				VARCHAR(5)						NOT NULL,
+    cep				CHAR(8) CHECK (len(cep)=8)		NULL,
+    email			VARCHAR(100)					NULL,
+    ddd				CHAR(2)							NOT NULL,
+    tel				CHAR(8)							NOT NULL,
+        
+    PRIMARY KEY (cod_cliente)
+)
+--
+CREATE TABLE venda(
+	cod_vend 		INT 							NOT NULL,
+	cod_cliente 	INT 							NOT NULL,
+	nf				INT								NOT NULL,
+	data			DATE							NOT NULL,
+
+	PRIMARY KEY (cod_venda)
+	FOREIGN KEY (cod_cliente) REFERENCES cliente (cod_cliente)
+)
+--
+CREATE TABLE embalagem_venda(
+	cod_embalagem 	INT 							NOT NULL,
+    cod_venda		INT								NOT NULL,
+    
+    FOREIGN KEY (cod_embalagem) REFERENCES embalagem(cod_embalagem),
+    FOREIGN KEY (cod_venda) REFERENCES venda (cod_venda)
+)
+--
+CREATE TABLE embalagem(
+	cod_embalagem 	INT								NOT NULL,
+	cod_lote		INT								NOT NULL,
+    qtd				INT								NOT NULL,
+    data			DATE							NOT NULL,
+    
+    PRIMARY KEY (cod_embalagem)
+    FOREIGN KEY (cod_lote) REFERENCES lote(cod_lote)
+)
+--
+CREATE TABLE lote(
+	cod_lote		INT 							NOT NULL,
+    cod_cultura		INT 							NOT NULL,
+    unidade			VARCHAR(20)						NOT NULL,
+    embalado		DATE							NULL,
+    plantio			DATE							NULL,
+    colheita		DATE							NULL,
+    obs				VARCHAR(255)					NULL,
+    
+    PRIMARY KEY (cod_lote)
+    FOREIGN KEY (cod_cultura) REFERENCES cultura (cod_cultura)
+)
+--
+CREATE TABLE cultura(
+	cod_cultura 	INT 							NOT NULL,
+    nome			VARCHAR(100)					NOT NULL,
+    
+    PRIMARY KEY (cod_cultura)
+)
+--
+CREATE TABLE colheita(
+	cod_colheita	INT								NOT NULL,
+    cod_lote		INT								NOT NULL,
+    qtd				INT								NOT NULL,
+    obs				VARCHAR(255)					NULL,
+    ultima_colheita	BIT								NULL,
+    
+	PRIMARY KEY (cod_colheita)
+    FOREIGN KEY (cod_lote) REFERENCES lote(cod_lote)
+)
+--
+CREATE TABLE aplicacao(
+	cod_aplicacao 	INT 							NOT NULL,
+    cod_lote		INT 							NOT NULL,
+    cod_insumo		INT 							NOT NULL,
+    data			DATE							NOT NULL,
+    obs				VARCHAR(255)					NULL,
+
+	PRIMARY KEY (cod_aplicacao)
+    FOREIGN KEY (cod_lote) REFERENCES lote (cod_lote),
+    FOREIGN KEY (cod_insumo) REFERENCES insumo (cod_insumo)
+)
+--
+CREATE TABLE insumo(
+	cod_insumo 		INT 							NOT NULL,
+    nome			VARCHAR(100)					NOT NULL,
+    composicao		VARCHAR(200)					NOT NULL,
+    carencia		INT								NOT NULL,
+    dose			FLOAT							NOT NULL,
+    unidade			VARCHAR(20)						NOT NULL,
+    
+    PRIMARY KEY (cod_insumo)
+)
+--
